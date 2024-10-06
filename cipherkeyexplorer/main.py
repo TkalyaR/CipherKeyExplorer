@@ -1,4 +1,6 @@
 # Определяем русский алфавит, который будет использоваться для шифрования и дешифрования
+import argparse
+
 alphabet = "абвгдежзийклмнопрстуфхцчшщьыъэюя"
 
 def ex_gcd(a, b, x=0, y=1):
@@ -135,6 +137,25 @@ def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
                     # Если текст соответствует критериям, выводим результат
                     print(f"a={a}, b={b}\t->\t{decrypted_text}")
 
-# Пример использования функции
-ciphertext = "цвйфиоицчякчвоицгяшфяечвоицшифвгочвэюгошяоабюигюсщфаюабагэцвчяечвфвгифвлпбифчвювшщк"
-brute_force_affine_decrypt(ciphertext)
+
+def main():
+    parser = argparse.ArgumentParser(description='CipherKeyExplorer')
+    parser.add_argument('-i', '--input', type=str, required=True, help='ciphertext string')
+    parser.add_argument('-d', '--deep', default=2, type=int, help='search depth determination')
+    parser.add_argument('-w', '--width', default=3, type=int, help='definition of search width')
+    args = parser.parse_args()
+
+    ciphertext, deep, width = args.input, args.deep, args.width
+
+    if len(ciphertext) < 20:
+        raise ValueError("Error: the ciphertext is too short")
+    if deep < 1:
+        raise ValueError("Error: the depth cannot be less than one")
+    if width < deep:
+        raise ValueError("Error: the width cannot be less than the depth")
+
+    brute_force_affine_decrypt(ciphertext, deep, width)
+
+
+if __name__ == '__main__':
+    main()
