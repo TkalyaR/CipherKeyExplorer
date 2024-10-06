@@ -14,29 +14,29 @@ def ex_gcd(a, b, x=0, y=1):
     :return: Кортеж (d, x, y), где d - НОД(a, b), x и y - коэффициенты, удовлетворяющие уравнению.
     """
     if a == 0:
-        x, y = 0, 1
-        return b, x, y
-    else:
-        d, x1, y1 = ex_gcd(b % a, a, x, y)
-        x = y1 - (b // a) * x1
-        y = x1
-        return d, x, y
-        
+        return b, 0, 1
+    d, x1, y1 = ex_gcd(b % a, a, x, y)
+    x = y1 - (b // a) * x1
+    return d, x, x1
+
 
 def mod_inverse(a, m):
     """
     Находит обратное по модулю значение a относительно m.
-    
+
     :param a: Целое число, для которого ищется обратное значение.
     :param m: Модуль.
     :return: Обратное значение x такое, что (a * x) % m = 1, или None, если обратного значения не существует.
     """
+    if m <= 0:
+        raise ValueError("Модуль должен быть больше 0.")
     a = a % m  # Приводим a к положительному значению в пределах [0, m)
+
     g, x, _ = ex_gcd(a, m)
     if g != 1:
         return None  # Обратного элемента не существует
-    else:
-        return x % m
+    return x % m
+
 
 def affine_decrypt(ciphertext, a, b):
     """
@@ -53,8 +53,8 @@ def affine_decrypt(ciphertext, a, b):
     if a_inv is None:
         return None
 
-    decrypted_text = ""  # Инициализируем переменную для расшифрованного текста
-
+    # Расшифровываем текст
+    decrypted_text = ""  # переменная для расшифрованного текста
     for char in ciphertext:
         if char in alphabet:
             y = alphabet.index(char)  # Индекс символа в алфавите
@@ -62,15 +62,15 @@ def affine_decrypt(ciphertext, a, b):
             decrypted_text += alphabet[x]  # Добавляем расшифрованный символ
         else:
             decrypted_text += char  # Если символ не в алфавите, добавляем его как есть
-
     return decrypted_text
+
 
 def matches_criteria(decrypted_text, ciphertext, criteria):
     """
     Проверяет, соответствует ли расшифрованный текст заданным критериям.
     
-    :param decrypted_text: Расшифрованный текст (строка).
-    :param ciphertext: Исходный зашифрованный текст (строка).
+    :param decrypted_text: Расшифрованный текст.
+    :param ciphertext: Исходный зашифрованный текст.
     :param criteria: Словарь с соответствиями букв (dict).
     :return: True, если расшифрованный текст соответствует всем критериям, иначе False.
     """
@@ -89,23 +89,16 @@ def most_frequent_letters(text, top_n=5):
     :param top_n: Количество самых популярных букв для возврата.
     :return: Список кортежей с топ_n символами по частоте повторений.
     """
-    # Создаем словарь для подсчета частоты букв
-    frequency = {}
-    
+    frequency = {} # Переменная для подсчета частоты букв
     for char in text:
         if char.isalpha():  # Убедимся, что это буква
-            if char in frequency:
-                frequency[char] += 1
-            else:
-                frequency[char] = 1
+            frequency[char] = frequency.get(char, 0) + 1  # Увеличиваем счетчик
 
-    # Сортируем буквы по частоте
+    # Сортируем буквы по частоте и возвращаем N-букв
     sorted_letters = sorted(frequency.items(), key=lambda item: item[1], reverse=True)
-
-    # Возвращаем топ N самых популярных букв
     return sorted_letters[:top_n]
 
-def brute_force_affine_decrypt(ciphertext, deep=2, width=4):
+def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
     """
     Перебирает все возможные ключи для дешифровки.
     
@@ -114,15 +107,15 @@ def brute_force_affine_decrypt(ciphertext, deep=2, width=4):
     :param width: Ширина поиска (количество критериев).
     """
 
-    if width < deep:
+    if width < depth:
         raise ValueError("Error: the search depth cannot be less than the width")
-    if  deep < 2:
+    if  depth < 2:
         raise ValueError("Error: the depth cannot be less than 2")
 
     m = len(alphabet)  # Длина алфавита
 
     # Поиск совпадений
-    top = most_frequent_letters(ciphertext, top_n=deep)
+    top = most_frequent_letters(ciphertext, top_n=depth)
     top_char = 'оеаинтсрвл' # топ букв русского языка
     permutation = ''
     for i in range(width):
@@ -133,8 +126,6 @@ def brute_force_affine_decrypt(ciphertext, deep=2, width=4):
     for char, _ in top:
         criteria[char] = permutation
     print(criteria)
-
-
 
     for a in range(1, m):
         if mod_inverse(a, m) is not None:  # Проверяем, что a имеет обратное
