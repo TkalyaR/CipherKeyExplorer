@@ -83,13 +83,13 @@ def matches_criteria(decrypted_text, ciphertext, criteria):
                 return False
     return True
 
-def most_frequent_letters(text, top_n=5):
+def most_frequent_letters(text, n=5):
     """
     Находит самые популярные буквы в строке.
     
     :param text: Исходная строка.
-    :param top_n: Количество самых популярных букв для возврата.
-    :return: Список кортежей с топ_n символами по частоте повторений.
+    :param n: Количество самых популярных букв для возврата.
+    :return: Список кортежей с n символами по частоте повторений.
     """
     frequency = {} # Переменная для подсчета частоты букв
     for char in text:
@@ -98,7 +98,8 @@ def most_frequent_letters(text, top_n=5):
 
     # Сортируем буквы по частоте и возвращаем N-букв
     sorted_letters = sorted(frequency.items(), key=lambda item: item[1], reverse=True)
-    return sorted_letters[:top_n]
+    return sorted_letters[:n]
+
 
 def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
     """
@@ -117,12 +118,12 @@ def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
     m = len(alphabet)  # Длина алфавита
 
     # Поиск совпадений
-    top = most_frequent_letters(ciphertext, top_n=depth)
+    top = most_frequent_letters(ciphertext, depth)
     top_char = 'оеаинтсрвл' # топ букв русского языка
     permutation = ''
     for i in range(width):
         permutation += top_char[i]
-    
+
     # Определяем критерии соответствий для проверки расшифровки
     criteria = {}
     for char, _ in top:
@@ -140,19 +141,14 @@ def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
 
 def main():
     parser = argparse.ArgumentParser(description='CipherKeyExplorer')
-    parser.add_argument('-i', '--input', type=str, required=True, help='ciphertext string')
-    parser.add_argument('-d', '--deep', default=2, type=int, help='search depth determination')
-    parser.add_argument('-w', '--width', default=3, type=int, help='definition of search width')
+    parser.add_argument('-i', '--input', type=str, required=True, help='Ciphertext string to be decrypted.')
+    parser.add_argument('-d', '--depth', default=2, type=int, help='Search depth for matching criteria (minimum 2).')
+    parser.add_argument('-w', '--width', default=3, type=int, help='Search width for matching criteria (minimum 2).')
     args = parser.parse_args()
 
-    ciphertext, deep, width = args.input, args.deep, args.width
-
-    if len(ciphertext) < 20:
-        raise ValueError("Error: the ciphertext is too short")
-    if deep < 1:
-        raise ValueError("Error: the depth cannot be less than one")
-    if width < deep:
-        raise ValueError("Error: the width cannot be less than the depth")
+    ciphertext = args.input
+    deep = args.depth
+    width = args.width
 
     brute_force_affine_decrypt(ciphertext, deep, width)
 
