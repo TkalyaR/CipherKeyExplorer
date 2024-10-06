@@ -154,7 +154,16 @@ def main():
     parser.add_argument('-w', '--width', default=3, type=int, help='definition of search width')
     args = parser.parse_args()
 
-    brute_force_affine_decrypt(args.input, args.deep, args.width)
+    ciphertext, deep, width = args.input, args.deep, args.width
+
+    if len(ciphertext) < 20:
+        raise ValueError("Error: the ciphertext is too short")
+    if deep < 1:
+        raise ValueError("Error: the depth cannot be less than one")
+    if width < deep:
+        raise ValueError("Error: the width cannot be less than the depth")
+
+    brute_force_affine_decrypt(ciphertext, deep, width)
 
 
 if __name__ == '__main__':
