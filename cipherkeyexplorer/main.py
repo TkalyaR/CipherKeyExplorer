@@ -1,8 +1,6 @@
 # Определяем русский алфавит, который будет использоваться для шифрования и дешифрования
 import argparse
 
-alphabet = "абвгдежзийклмнопрстуфхцчшщьыъэюя"
-
 def ex_gcd(a, b, x=0, y=1):
     """
     Вычисляет наибольший общий делитель (НОД) двух чисел a и b
@@ -40,7 +38,7 @@ def mod_inverse(a, m):
     return x % m
 
 
-def affine_decrypt(ciphertext, a, b):
+def affine_decrypt(ciphertext, a, b, alphabet):
     """
     Дешифрует зашифрованный текст методом афинного шифра.
     
@@ -101,10 +99,11 @@ def most_frequent_letters(text, n=5):
     return sorted_letters[:n]
 
 
-def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
+def brute_force_affine_decrypt(ciphertext, depth=2, width=4, language='ru'):
     """
     Перебирает все возможные ключи для дешифровки.
     
+    :param language: язык
     :param ciphertext: Зашифрованный текст (строка).
     :param depth: Глубина поиска (количество совпадений).
     :param width: Ширина поиска (количество критериев).
@@ -115,14 +114,21 @@ def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
     if  depth < 2:
         raise ValueError("Error: the depth cannot be less than 2")
 
-    m = len(alphabet)  # Длина алфавита
+    alphabet = {
+        'ru': 'абвгдежзийклмнопрстуфхцчшщьыъэюя',
+        'en': 'abcdefghijklmnopqrstuvwxyz',
+    }
+    m = len(alphabet[language])  # Длина алфавита
 
     # Поиск совпадений
     top = most_frequent_letters(ciphertext, depth)
-    top_char = 'оеаинтсрвл' # топ букв русского языка
+    top_char = {
+        'ru': 'оеаинтсрвлкмдпуяыьгзбчйхжшюцщэфёъ',
+        'en': 'edsarntolcudpmghbyfvkwzxqj',
+    }
     permutation = ''
     for i in range(width):
-        permutation += top_char[i]
+        permutation += top_char[language][i]
 
     # Определяем критерии соответствий для проверки расшифровки
     criteria = {}
@@ -133,7 +139,7 @@ def brute_force_affine_decrypt(ciphertext, depth=2, width=4):
     for a in range(1, m):
         if mod_inverse(a, m) is not None:  # Проверяем, что a имеет обратное
             for b in range(m):
-                decrypted_text = affine_decrypt(ciphertext, a, b)  # Дешифруем текст
+                decrypted_text = affine_decrypt(ciphertext, a, b, alphabet[language])  # Дешифруем текст
                 if decrypted_text is not None and matches_criteria(decrypted_text, ciphertext, criteria):
                     # Если текст соответствует критериям, выводим результат
                     print(f"a={a}, b={b}\t->\t{decrypted_text}")
@@ -144,13 +150,16 @@ def main():
     parser.add_argument('-i', '--input', type=str, required=True, help='Ciphertext string to be decrypted.')
     parser.add_argument('-d', '--depth', default=2, type=int, help='Search depth for matching criteria (minimum 2).')
     parser.add_argument('-w', '--width', default=3, type=int, help='Search width for matching criteria (minimum 2).')
+    parser.add_argument('-l', '--language', type=str, choices=['ru', 'en'], default='ru',
+                        help='Substitution language (default: ru). Choices: ru, en')
     args = parser.parse_args()
 
     ciphertext = args.input
     deep = args.depth
     width = args.width
+    language = args.language
 
-    brute_force_affine_decrypt(ciphertext, deep, width)
+    brute_force_affine_decrypt(ciphertext, deep, width, language)
 
 
 if __name__ == '__main__':
