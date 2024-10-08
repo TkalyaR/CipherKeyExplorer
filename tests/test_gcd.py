@@ -12,9 +12,9 @@ class TestAffineCipher(unittest.TestCase):
         self.assertEqual(ex_gcd(0, 5), (5, 0, 1))
         self.assertEqual(ex_gcd(5, 0), (5, 1, 0))
         # Тесты с отрицательными числами
-        # self.assertEqual(ex_gcd(-54, 24), (6, -1, -2))
-        # self.assertEqual(ex_gcd(24, -54), (6, 1, -2))
-        # self.assertEqual(ex_gcd(-24, -54), (6, -1, -2))
+        self.assertEqual(ex_gcd(-54, 24), (6, 1, 2))
+        self.assertEqual(ex_gcd(54, -24), (6, 1, 2))
+        self.assertEqual(ex_gcd(-54, -24), (6, 1, -2))
         # Тесты на взаимно простые числа
         self.assertEqual(ex_gcd(35, 64), (1, 11, -6))
         # Тесты на большие числа
