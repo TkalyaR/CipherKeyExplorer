@@ -1,6 +1,7 @@
 # Определяем русский алфавит, который будет использоваться для шифрования и дешифрования
 import argparse
 
+
 def ex_gcd(a, b, x=0, y=1):
     """
     Вычисляет наибольший общий делитель (НОД) двух чисел a и b
@@ -41,7 +42,7 @@ def mod_inverse(a, m):
 def affine_decrypt(ciphertext, a, b, alphabet):
     """
     Дешифрует зашифрованный текст методом афинного шифра.
-    
+
     :param ciphertext: Зашифрованный текст (строка).
     :param a: Параметр шифрования a (целое число).
     :param b: Параметр шифрования b (целое число).
@@ -68,7 +69,7 @@ def affine_decrypt(ciphertext, a, b, alphabet):
 def matches_criteria(decrypted_text, ciphertext, criteria):
     """
     Проверяет, соответствует ли расшифрованный текст заданным критериям.
-    
+
     :param decrypted_text: Расшифрованный текст.
     :param ciphertext: Исходный зашифрованный текст.
     :param criteria: Словарь с соответствиями букв (dict).
@@ -81,15 +82,16 @@ def matches_criteria(decrypted_text, ciphertext, criteria):
                 return False
     return True
 
+
 def most_frequent_letters(text, n=5):
     """
     Находит самые популярные буквы в строке.
-    
+
     :param text: Исходная строка.
     :param n: Количество самых популярных букв для возврата.
     :return: Список кортежей с n символами по частоте повторений.
     """
-    frequency = {} # Переменная для подсчета частоты букв
+    frequency = {}  # Переменная для подсчета частоты букв
     for char in text:
         if char.isalpha():  # Убедимся, что это буква
             frequency[char] = frequency.get(char, 0) + 1  # Увеличиваем счетчик
@@ -102,7 +104,7 @@ def most_frequent_letters(text, n=5):
 def brute_force_affine_decrypt(ciphertext, depth=2, width=4, language='ru'):
     """
     Перебирает все возможные ключи для дешифровки.
-    
+
     :param language: язык
     :param ciphertext: Зашифрованный текст (строка).
     :param depth: Глубина поиска (количество совпадений).
@@ -111,7 +113,7 @@ def brute_force_affine_decrypt(ciphertext, depth=2, width=4, language='ru'):
 
     if width < depth:
         raise ValueError("Error: the search depth cannot be less than the width")
-    if  depth < 2:
+    if depth < 2:
         raise ValueError("Error: the depth cannot be less than 2")
 
     alphabet = {
