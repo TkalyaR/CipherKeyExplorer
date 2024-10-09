@@ -20,13 +20,11 @@ class TestAffineCipher(unittest.TestCase):
         # Тесты на большие числа
         self.assertEqual(ex_gcd(123456, 654321), (3, -46741, 8819))
 
-
-    
     def test_mod_inverse(self):
         # Тест с большим модулем:
         self.assertEqual(mod_inverse(7, 50), 43)
         # Тест с отрицательным элементом:
-        self.assertEqual(mod_inverse(-1, 7) , 6)
+        self.assertEqual(mod_inverse(-1, 7), 6)
         # Тест с взаимно простыми числами:
         self.assertEqual(mod_inverse(10, 21), 19)
         # Тест с одинаковыми a, m
@@ -35,6 +33,7 @@ class TestAffineCipher(unittest.TestCase):
         # Обратного элемента не существует
         self.assertIsNone(mod_inverse(2, 6))
         self.assertIsNone(mod_inverse(0, 6))
+
 
 if __name__ == '__main__':
     unittest.main()
