@@ -1,0 +1,58 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches:
+      - master  # Запуск при коммите в master
+  pull_request:
+    branches:
+      - '**'  # Запуск при PR в любую ветку
+
+permissions:
+  contents: read
+  pull-requests: write  # Разрешение на запись для добавления комментариев
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Установка Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Установка зависимостей
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Линтинг с помощью flake8
+      id: lint
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Тестирование с помощью unittest
+      id: test
+      run: |
+        python -m unittest discover -s tests -p "*.py"
+
+    - name: Комментарий к pull request
+      if: github.event_name == 'pull_request'
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          STATUS="Успешно"
+          EMOJI="✔️"
+        else
+          STATUS="Провалился"
+          EMOJI="🚧"
+        fi
+        COMMENT="Проект *${{ github.event.repository.name }}* на Python версии 3.10 $STATUS $EMOJI."
+        curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+             -X POST \
+             -d "{\"body\": \"$COMMENT\"}" \
+             "${{ github.event.pull_request.comments_url }}"
